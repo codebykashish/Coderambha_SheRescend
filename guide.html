@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Emergency Survival Guide</title>
+    <link rel="stylesheet" href="CSS/guide.css" />
+  </head>
+  <body>
+    <header>
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        ⬅
+      </button>
+      <h1 id="guide-title">Emergency Survival Guide</h1>
+      <div class="header-controls">
+        <button id="lang-toggle">English</button>
+      </div>
+    </header>
+
+    <main id="categories">
+      <div class="category" onclick="window.location.href='firstaid.html'">
+        <div class="icon">🩺</div>
+        <h2 id="cat-firstaid">First Aid</h2>
+        <p id="desc-firstaid">Quick help for injuries and emergencies.</p>
+      </div>
+
+      <div class="category" onclick="window.location.href='water.html'">
+        <div class="icon">💧</div>
+        <h2 id="cat-water">Water Purification</h2>
+        <p id="desc-water">Methods to make water safe to drink.</p>
+      </div>
+
+      <div class="category" onclick="window.location.href='floodsafety.html'">
+        <div class="icon">🌊</div>
+        <h2 id="cat-flood">Flood Safety</h2>
+        <p id="desc-flood">Tips to stay safe during floods.</p>
+      </div>
+
+      <div class="category" onclick="window.location.href='diseases.html'">
+        <div class="icon">🦠</div>
+        <h2 id="cat-diseases">Waterborne Diseases</h2>
+        <p id="desc-diseases">Prevention and care for common illnesses.</p>
+      </div>
+
+      <div class="category" onclick="window.location.href='mosquito.html'">
+        <div class="icon">🦟</div>
+        <h2 id="cat-mosquito">Mosquito Prevention</h2>
+        <p id="desc-mosquito">
+          How to protect yourself from mosquito-borne diseases.
+        </p>
+      </div>
+
+      <div class="category" onclick="window.location.href='fandw.html'">
+        <div class="icon">🍲</div>
+        <h2 id="cat-food">Food & Water Safety</h2>
+        <p id="desc-food">Safe handling of food and clean water.</p>
+      </div>
+    </main>
+
+    <script src="js/guide.js"></script>
+    <script src="js/lang.js"></script>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+.back-btn {
+  background: white;
+  color: #007BFF;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.back-btn:hover {
+  background: #e6e6e6;
+}
+
+/* Header */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007BFF;
+  color: white;
+  padding: 18px 20px;
+}
+
+header h1 {
+  font-size: 1.6em;
+  margin: 0;
+}
+
+.header-controls button {
+  background: white;
+  color: #007BFF;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.header-controls button:hover {
+  background: #e6e6e6;
+}
+
+/* Flood Safety container */
+#flood-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Method Box */
+.method-box {
+  background-color: #3991ba; /* Theme blue */
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.method-box h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+}
+
+.steps {
+  margin-top: 12px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  background-color: rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.step img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.step p {
+  margin: 0;
+}
+/* --- Existing CSS above remains unchanged --- */
+
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  main {
+    margin: 16px;
+    padding: 0 10px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .question {
+    font-size: 1rem;
+  }
+
+  .option-btn {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

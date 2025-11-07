@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #ffecec; /* light red background */
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ff4d4d; /* red header */
+  color: white;
+  padding: 12px 20px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.back-btn {
+  background: white;
+  color: #ff4d4d;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.back-btn:hover {
+  background: #e6e6e6;
+}
+
+.header-controls button {
+  background: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+#helpline-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.helpline-box {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border-left: 5px solid #ff4d4d;
+}
+
+.helpline-box h2 {
+  margin-top: 0;
+  color: #ff4d4d;
+  font-size: 1.3rem;
+}
+
+.helpline-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.helpline-box li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.helpline-box li:last-child {
+  border-bottom: none;
+}
+
+.helpline-box a {
+  text-decoration: none;
+  color: #111;
+  font-weight: bold;
+}
+
+.helpline-box a:hover {
+  color: #ff4d4d;
+}
+/* --- Existing CSS above remains unchanged --- */
+
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  .mosquito-grid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .mosquito-box img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .mosquito-box h3 {
+    font-size: 1.1rem;
+  }
+
+  .mosquito-box p {
+    font-size: 0.85rem;
+  }
+}

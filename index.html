@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DisasterWise</title>
+  <link rel="stylesheet" href="CSS/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <div id="mobile-topbar" aria-label="App controls">
+    <div class="left">
+      <span class="brand">DisasterWise</span>
+    </div>
+    <div class="right">
+      <button id="mobile-search-btn" title="Search">🔍</button>
+      <button id="mobile-game-btn" title="Game">🎮</button>
+      <button id="mobile-phone-btn" title="Helpline">📞</button>
+      <button id="mobile-lang-toggle" title="Language">E</button>
+    </div>
+  </div>
+
+  <main>
+    <section id="search-section">
+      <input id="place-search" type="text" placeholder="Search places..." />
+      <button id="search-icon" aria-label="Search">🔍</button>
+    </section>
+
+    <div id="map-container">
+      <div id="map"></div>
+
+      <button id="sos-btn" aria-label="Emergency (SOS)" title="Emergency (SOS)">SOS</button>
+
+      <div id="sos-card" class="hidden" role="dialog" aria-modal="true" tabindex="-1">
+        <div class="sos-card-body">
+          <div><strong>👮 <span data-i18n="policeLabel">Police</span>:</strong> 100</div>
+          <div><strong>🚑 <span data-i18n="ambulanceLabel">Ambulance</span>:</strong> 102</div>
+          <div><strong>🚒 <span data-i18n="fireLabel">Fire Brigade</span>:</strong> 101</div>
+          <div><strong>👩 <span data-i18n="womenLabel">Women Helpline</span>:</strong> 1145</div>
+          <div><strong>📞 <span data-i18n="childLabel">Child Helpline</span>:</strong> 1098</div>
+        </div>
+      </div>
+
+      <button id="locate-btn" aria-label="My location" title="My location">📍</button>
+
+      <div id="phone-pop" class="hidden" role="dialog" aria-modal="true" aria-label="Helpline">
+        <div class="phone-pop-header">
+          <span class="phone-pop-title">Helpline</span>
+          <button id="phone-pop-close" aria-label="Close">×</button>
+        </div>
+        <div id="phone-pop-body" class="phone-pop-body"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="guide-peek" role="button" aria-controls="guide-sheet" aria-expanded="false">
+    <div class="peek-handle"></div>
+    <div class="peek-text">Emergency Guide</div>
+  </div>
+
+  <div id="guide-sheet" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <button id="sheet-close" aria-label="Close">⌄</button>
+    <div class="sheet-content">
+      <a href="firstaid.html" id="lnk-firstaid">🩺 First Aid</a>
+      <a href="water.html" id="lnk-water">💧 Water Purification</a>
+      <a href="floodsafety.html" id="lnk-flood">🌊 Flood Safety</a>
+      <a href="diseases.html" id="lnk-diseases">🦠 Waterborne Diseases</a>
+      <a href="mosquito.html" id="lnk-mosquito">🦟 Mosquito Prevention</a>
+      <a href="fandw.html" id="lnk-food">🍲 Food & Water Safety</a>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="datajs/helpline-data.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

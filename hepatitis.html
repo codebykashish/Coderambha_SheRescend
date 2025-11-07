@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hepatitis - Waterborne Diseases</title>
+  <link rel="stylesheet" href="CSS/disease.css" />
+</head>
+<body>
+  <header>
+    <button class="back-btn" onclick="window.location.href='diseases.html'">⬅</button>
+    <div class="header-content">
+      <img src="images/hepatitis.jpeg" alt="Hepatitis A" class="disease-icon" />
+      <h1 id="disease-title">Hepatitis A</h1>
+    </div>
+    <div class="header-controls">
+      <button id="lang-toggle">English</button>
+    </div>
+  </header>
+
+  <main class="disease-main">
+    <section class="info-section">
+      <h2 id="symptoms-title">Symptoms</h2>
+      <ul id="symptoms-list" class="info-list"></ul>
+    </section>
+
+    <section class="info-section">
+      <h2 id="prevention-title">Prevention</h2>
+      <ul id="prevention-list" class="info-list"></ul>
+    </section>
+
+    <section class="info-section">
+      <h2 id="remedies-title">Home Remedies</h2>
+      <ul id="remedies-list" class="info-list"></ul>
+    </section>
+  </main>
+
+  <script src="datajs/hepatitis-data.js"></script>
+  <script src="js/hepatitis.js"></script>
+  <script src="js/lang.js"></script>
+</body>
+</html>

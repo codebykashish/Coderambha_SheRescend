@@ -1,0 +1,120 @@
+/* --- Header --- */
+header {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+/* Header controls + Back button */
+.header-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.header-controls button,
+.back-btn {
+  background: white;
+  color: #007BFF;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.header-controls button:hover,
+.back-btn:hover {
+  background: #e6e6e6;
+}
+
+/* --- Page layout --- */
+body {
+  background: #f8fafc;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+#water-container {
+  max-width: 1000px;
+  margin: 16px auto 24px;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+/* Responsive 2-column layout on larger screens */
+@media (min-width: 720px) {
+  #water-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* --- Water card --- */
+.water-box {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(30, 64, 175, 0.08);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+
+.water-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(30, 64, 175, 0.12);
+  background: #eaf2ff;
+}
+
+.water-box h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Steps --- */
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(219, 234, 254, 0.55);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.step .step-text {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.98rem;
+  line-height: 1.35rem;
+}
+
+/* --- Video styling --- */
+#water-video {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* Small screens adjustments */
+@media (max-width: 420px) {
+  .step {
+    align-items: flex-start;
+  }
+}

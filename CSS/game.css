@@ -1,0 +1,40 @@
+header {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-left h1 { margin: 0; font-size: 1.5em; }
+.header-left button, .header-controls button {
+  background: white; color: #007BFF; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;
+}
+.header-left button:hover, .header-controls button:hover { background: #e6e6e6; }
+
+main { max-width: 800px; margin: 20px auto; padding: 0 16px; }
+.scorebar { display: flex; justify-content: space-between; align-items: center; color: #111827; margin-bottom: 12px; font-weight: 600; }
+.card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 8px 18px rgba(0,0,0,0.06); }
+.question { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+.options { display: grid; gap: 10px; }
+.option-btn {
+  text-align: left; width: 100%; background: #f9fafb; border: 1px solid #e5e7eb; color: #111827; padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  transition: transform .05s ease, background .15s ease;
+}
+.option-btn:hover { background: #f3f4f6; transform: translateY(-1px); }
+.option-btn:disabled { cursor: default; opacity: .95; transform: none; }
+.option-btn.correct { background: #dcfce7; border-color: #86efac; color: #065f46; }
+.option-btn.incorrect { background: #fee2e2; border-color: #fecaca; color: #7f1d1d; }
+.actions { display: flex; gap: 10px; margin-top: 14px; }
+#next-btn, #restart-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+#next-btn[disabled] { background: #93c5fd; cursor: not-allowed; }
+#restart-btn { background: #10b981; }
+.hidden { display: none; }
+
+@media (max-width: 768px) {
+  main { max-width: 100%; margin: 10px auto; }
+  .card { padding: 14px; }
+  .question { font-size: 16px; }
+  .option-btn { padding: 10px; font-size: 15px; }
+}

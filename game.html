@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Game • DisasterWise</title>
+  <link rel="stylesheet" href="CSS/game.css" />
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <button id="back-btn" onclick="window.location.href='index.html'">⬅</button>
+      <h1 id="game-title">GAME</h1>
+    </div>
+    <div class="header-controls">
+      <button id="lang-toggle">E</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="scorebar">
+      <div id="progress">Question 1/10</div>
+      <div id="score">Score: 0</div>
+    </section>
+
+    <section class="card">
+      <div id="question" class="question">Question text</div>
+      <div id="options" class="options"></div>
+
+      <div class="actions">
+        <button id="next-btn" disabled>Next ▶</button>
+        <button id="restart-btn" class="hidden">Restart</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/translations.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

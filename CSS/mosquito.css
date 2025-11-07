@@ -1,0 +1,146 @@
+/* ===== Header (matching other pages) ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #0a66ff, #12a3ff);
+  color: #ffffff;
+  padding: 18px 20px;
+  box-shadow: 0 6px 24px rgba(18, 163, 255, 0.25);
+}
+
+#mosquito-title {
+  font-size: 1.7em;
+  margin: 0;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.header-controls button,
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #0a66ff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: clamp(12px, 1.4vw, 16px);
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(10, 102, 255, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.header-controls button:hover,
+.back-btn:hover {
+  background: #f6fbff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(10, 102, 255, 0.22);
+}
+
+/* ===== Page background ===== */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+  background: linear-gradient(180deg, #f2f7ff 0%, #e9f2ff 100%);
+}
+
+/* ===== Main container ===== */
+.mosquito-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  padding: 22px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .mosquito-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Mosquito Prevention boxes ===== */
+.mosquito-box {
+  background: #ffffff;
+  border: 1px solid #dbe7ff;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(8, 33, 94, 0.06), 0 8px 24px rgba(36, 106, 255, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mosquito-box::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 140%;
+  height: 80%;
+  background: radial-gradient(ellipse at top, rgba(10, 102, 255, 0.08), rgba(10, 102, 255, 0) 60%);
+  pointer-events: none;
+  transform: rotate(-6deg);
+}
+
+.mosquito-box:hover {
+  transform: translateY(-3px);
+  border-color: #c9dcff;
+  box-shadow: 0 12px 30px rgba(25, 92, 255, 0.16);
+}
+
+.mosquito-box .icon {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.18));
+  display: block;
+  line-height: 1;
+}
+
+.mosquito-box h3 {
+  margin: 12px 0 10px;
+  color: #0f2b6e;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.mosquito-box p {
+  font-size: 0.98rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== Responsive tweaks ===== */
+@media (max-width: 480px) {
+  .mosquito-grid {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .mosquito-box {
+    padding: 20px 18px;
+    border-radius: 14px;
+  }
+
+  .mosquito-box .icon {
+    font-size: 3rem;
+  }
+
+  .mosquito-box h3 {
+    font-size: 1.22rem;
+  }
+
+  .mosquito-box p {
+    font-size: 0.96rem;
+  }
+}
