@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let routeTargetIndex = null;
   let routeLine = null;
   let routeSummary = null;
+  let isFirstRouteCalculation = true;
 
   const markersData = [
     { name: { en: 'Sainik Tudikhel', np: 'सैनिक तुँडिखेल' }, lat: 27.703377, lng: 85.315001, role: { en: 'Safe and Open area', np: 'सुरक्षित र खुला क्षेत्र' }, number: '', type: 'park' },
@@ -224,9 +225,18 @@ document.addEventListener('DOMContentLoaded', () => {
     routeTargetIndex = index;
     routeTarget = L.latLng(markersData[index].lat, markersData[index].lng);
     routeSummary = null;
+    isFirstRouteCalculation = true; // Reset for new route
     if (!isLocating) startLocationWatch();
-    updateRouteVisualization();
+    // If we have a location, request GraphHopper route immediately
+    if (lastLatLng) {
+      requestRouteToMarker(lastLatLng, routeTarget, index);
+    } else {
+      // Wait for location, updateRouteVisualization will be called when location is available
+      updateRouteVisualization();
+    }
     markers[index].setPopupContent(buildPopupHtml(markersData[index], index));
+    // Re-wire the buttons after updating popup content
+    wireRouteButton(index);
     markers[index].openPopup();
   }
 
@@ -238,31 +248,127 @@ document.addEventListener('DOMContentLoaded', () => {
     routeSummary = null;
     routeTarget = null;
     routeTargetIndex = null;
+    isFirstRouteCalculation = true; // Reset flag
     if (typeof index === 'number' && markers[index]) {
       const marker = markers[index];
       const popup = marker.getPopup();
       const wasOpen = popup && map.hasLayer(popup);
       marker.setPopupContent(buildPopupHtml(markersData[index], index));
+      // Re-wire the buttons after updating popup content
+      wireRouteButton(index);
       if (wasOpen) marker.openPopup();
+    }
+    // Also clear GraphHopper route line if it exists separately
+    if (graphHopperRouteLine) {
+      map.removeLayer(graphHopperRouteLine);
+      graphHopperRouteLine = null;
     }
   }
 
-  function updateRouteVisualization() {
-    if (!routeTarget) return;
-    if (!lastLatLng) {
-      if (routeLine) {
-        map.removeLayer(routeLine);
-        routeLine = null;
-      }
-      routeSummary = null;
-      if (routeTargetIndex !== null) {
-        const popup = markers[routeTargetIndex].getPopup();
-        const wasOpen = popup && map.hasLayer(popup);
-        markers[routeTargetIndex].setPopupContent(buildPopupHtml(markersData[routeTargetIndex], routeTargetIndex));
-        if (wasOpen) markers[routeTargetIndex].openPopup();
-      }
-      return;
-    }
+  function requestRouteToMarker(start, end, markerIndex) {
+    // Request route from user's location to marker using GraphHopper
+    const url = `http://localhost:8989/route?point=${start.lat},${start.lng}&point=${end.lat},${end.lng}&profile=car&points_encoded=false`;
+    
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.paths && data.paths.length > 0) {
+          const path = data.paths[0];
+          let coordinates = [];
+
+          // Extract coordinates from the response
+          if (path.points && path.points.coordinates) {
+            path.points.coordinates.forEach(coord => {
+              coordinates.push([coord[1], coord[0]]);
+            });
+          } else if (path.points && typeof path.points === 'string') {
+            coordinates = decodePolyline(path.points);
+          } else if (path.geometry && path.geometry.coordinates) {
+            path.geometry.coordinates.forEach(coord => {
+              coordinates.push([coord[1], coord[0]]);
+            });
+          } else if (Array.isArray(path.points)) {
+            path.points.forEach(point => {
+              if (Array.isArray(point) && point.length >= 2) {
+                coordinates.push([point[1], point[0]]);
+              }
+            });
+          }
+
+          if (coordinates.length > 0) {
+            // Remove existing route line if any
+            if (routeLine) {
+              map.removeLayer(routeLine);
+            }
+
+            // Draw the route
+            routeLine = L.polyline(coordinates, {
+              color: '#2563eb',
+              weight: 5,
+              opacity: 0.8,
+              smoothFactor: 1
+            }).addTo(map);
+
+            // Fit map to show the entire route only on first calculation
+            if (isFirstRouteCalculation) {
+              const bounds = routeLine.getBounds();
+              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 18 });
+              isFirstRouteCalculation = false;
+            }
+
+            // Calculate route summary from GraphHopper data
+            if (path.distance && path.time) {
+              const distanceMeters = path.distance;
+              const minutes = path.time / 60000; // Convert milliseconds to minutes
+              routeSummary = {
+                distanceText: formatDistance(distanceMeters),
+                durationText: formatDuration(minutes)
+              };
+            } else {
+              // Fallback to straight-line distance if GraphHopper doesn't provide it
+              const distanceMeters = start.distanceTo(end);
+              const minutes = distanceMeters / WALKING_SPEED_MPS / 60;
+              routeSummary = {
+                distanceText: formatDistance(distanceMeters),
+                durationText: formatDuration(minutes)
+              };
+            }
+
+            // Update marker popup with route info
+            if (routeTargetIndex !== null && routeTargetIndex === markerIndex) {
+              const popup = markers[routeTargetIndex].getPopup();
+              const wasOpen = popup && map.hasLayer(popup);
+              markers[routeTargetIndex].setPopupContent(buildPopupHtml(markersData[routeTargetIndex], routeTargetIndex));
+              // Re-wire the buttons after updating popup content
+              wireRouteButton(routeTargetIndex);
+              if (wasOpen) markers[routeTargetIndex].openPopup();
+            }
+          } else {
+            console.warn('No coordinates found in route response', path);
+            // Fallback to straight line if GraphHopper fails
+            updateRouteVisualizationFallback();
+          }
+        } else {
+          console.warn('No paths in route response', data);
+          // Fallback to straight line if no route found
+          updateRouteVisualizationFallback();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching route:', error);
+        // Fallback to straight line visualization if GraphHopper fails
+        updateRouteVisualizationFallback();
+      });
+  }
+
+  function updateRouteVisualizationFallback() {
+    // Fallback to simple straight-line visualization if GraphHopper fails
+    if (!routeTarget || !lastLatLng) return;
 
     const points = [lastLatLng, routeTarget];
     if (!routeLine) {
@@ -283,7 +389,34 @@ document.addEventListener('DOMContentLoaded', () => {
       const popup = markers[routeTargetIndex].getPopup();
       const wasOpen = popup && map.hasLayer(popup);
       markers[routeTargetIndex].setPopupContent(buildPopupHtml(markersData[routeTargetIndex], routeTargetIndex));
+      // Re-wire the buttons after updating popup content
+      wireRouteButton(routeTargetIndex);
       if (wasOpen) markers[routeTargetIndex].openPopup();
+    }
+  }
+
+  function updateRouteVisualization() {
+    if (!routeTarget) return;
+    if (!lastLatLng) {
+      if (routeLine) {
+        map.removeLayer(routeLine);
+        routeLine = null;
+      }
+      routeSummary = null;
+      if (routeTargetIndex !== null) {
+        const popup = markers[routeTargetIndex].getPopup();
+        const wasOpen = popup && map.hasLayer(popup);
+        markers[routeTargetIndex].setPopupContent(buildPopupHtml(markersData[routeTargetIndex], routeTargetIndex));
+        // Re-wire the buttons after updating popup content
+        wireRouteButton(routeTargetIndex);
+        if (wasOpen) markers[routeTargetIndex].openPopup();
+      }
+      return;
+    }
+
+    // Use GraphHopper routing instead of straight line
+    if (routeTargetIndex !== null) {
+      requestRouteToMarker(lastLatLng, routeTarget, routeTargetIndex);
     }
   }
 
@@ -292,20 +425,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const name = d.name[currentLang] ?? d.name.en;
     const role = d.role[currentLang] ?? d.role.en;
     const contact = d.number ? `<br>Contact: ${d.number}` : '';
-    let routeDetails = '';
-    if (routeTargetIndex === index) {
-      if (routeSummary) {
-        routeDetails = `<div class="route-summary" style="margin-top:6px;">Distance: ${routeSummary.distanceText}<br>ETA: ${routeSummary.durationText}</div>`;
-      } else {
-        routeDetails = '<div class="route-summary" style="margin-top:6px;">Route set. Awaiting location…</div>';
-      }
-    }
     const buttonLabel = routeTargetIndex === index ? 'Update Route' : 'Set Route';
     const unsetButton = routeTargetIndex === index ? `<button type="button" class="route-action-btn route-unset-btn" data-route-unset="${index}">Unset</button>` : '';
     return `
       <div class="popup-body" data-marker-index="${index}">
         <b>${name}</b><br>Role: ${role}${contact}
-        ${routeDetails}
         <div class="popup-actions">
           <button type="button" class="route-action-btn route-set-btn" data-route-index="${index}">${buttonLabel}</button>
           ${unsetButton}
@@ -392,6 +516,253 @@ document.addEventListener('DOMContentLoaded', () => {
   if (locateBtn) {
     locateBtn.addEventListener('click', () => { if (isLocating) stopLocationWatch(); else startLocationWatch(); });
     locateBtn.addEventListener('dblclick', (e) => { if (isLocating && lastLatLng) { e.preventDefault(); map.setView(lastLatLng, Math.max(map.getZoom(), 15)); } });
+  }
+
+  // --- GraphHopper Routing ---
+  const routeBtn = document.getElementById('route-btn');
+  let isRoutingMode = false;
+  let routeStartPoint = null;
+  let routeEndPoint = null;
+  let routeStartMarker = null;
+  let routeEndMarker = null;
+  let graphHopperRouteLine = null;
+  let routeClickHandler = null;
+
+  function createRouteMarker(latlng, isStart) {
+    const color = isStart ? '#16a34a' : '#ef4444';
+    const icon = L.divIcon({
+      className: 'route-marker-icon',
+      html: `<div style="width:20px;height:20px;background:${color};border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    return L.marker(latlng, { icon, draggable: true, zIndexOffset: 1000 });
+  }
+
+  function clearRoute() {
+    if (routeStartMarker) {
+      map.removeLayer(routeStartMarker);
+      routeStartMarker = null;
+    }
+    if (routeEndMarker) {
+      map.removeLayer(routeEndMarker);
+      routeEndMarker = null;
+    }
+    if (graphHopperRouteLine) {
+      map.removeLayer(graphHopperRouteLine);
+      graphHopperRouteLine = null;
+    }
+    routeStartPoint = null;
+    routeEndPoint = null;
+  }
+
+  // Simple polyline decoder for GraphHopper encoded polylines
+  function decodePolyline(encoded) {
+    const coordinates = [];
+    let index = 0;
+    const len = encoded.length;
+    let lat = 0;
+    let lng = 0;
+
+    while (index < len) {
+      let b;
+      let shift = 0;
+      let result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      const dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      const dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      coordinates.push([lat * 1e-5, lng * 1e-5]);
+    }
+    return coordinates;
+  }
+
+  function requestRoute(start, end) {
+    // Request points_encoded=false to get coordinates directly, or we'll decode the polyline
+    const url = `http://localhost:8989/route?point=${start.lat},${start.lng}&point=${end.lat},${end.lng}&profile=car&points_encoded=false`;
+    
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.paths && data.paths.length > 0) {
+          const path = data.paths[0];
+          let coordinates = [];
+
+          // Try to extract coordinates from the response
+          if (path.points && path.points.coordinates) {
+            // GraphHopper returns [lng, lat] format, Leaflet needs [lat, lng]
+            path.points.coordinates.forEach(coord => {
+              coordinates.push([coord[1], coord[0]]);
+            });
+          } else if (path.points && typeof path.points === 'string') {
+            // Encoded polyline string
+            coordinates = decodePolyline(path.points);
+          } else if (path.geometry && path.geometry.coordinates) {
+            // Alternative geometry field
+            path.geometry.coordinates.forEach(coord => {
+              coordinates.push([coord[1], coord[0]]);
+            });
+          } else if (Array.isArray(path.points)) {
+            // Direct array of points
+            path.points.forEach(point => {
+              if (Array.isArray(point) && point.length >= 2) {
+                coordinates.push([point[1], point[0]]);
+              }
+            });
+          }
+
+          if (coordinates.length > 0) {
+            // Remove existing route line if any
+            if (graphHopperRouteLine) {
+              map.removeLayer(graphHopperRouteLine);
+            }
+
+            // Draw the route
+            graphHopperRouteLine = L.polyline(coordinates, {
+              color: '#2563eb',
+              weight: 5,
+              opacity: 0.8,
+              smoothFactor: 1
+            }).addTo(map);
+
+            // Fit map to show the entire route
+            const bounds = graphHopperRouteLine.getBounds();
+            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 18 });
+
+            // Display route info if available
+            if (path.distance && path.time) {
+              const distanceKm = (path.distance / 1000).toFixed(2);
+              const timeMinutes = Math.round(path.time / 60000);
+              console.log(`Route: ${distanceKm} km, ${timeMinutes} min`);
+              
+              // Update marker popups with route info
+              if (routeStartMarker) {
+                routeStartMarker.setPopupContent(`Start point<br>Distance: ${distanceKm} km<br>Time: ${timeMinutes} min`);
+              }
+              if (routeEndMarker) {
+                routeEndMarker.setPopupContent(`End point<br>Distance: ${distanceKm} km<br>Time: ${timeMinutes} min`);
+              }
+            }
+
+            // Setup drag handlers for markers
+            setupMarkerDrag();
+          } else {
+            console.warn('No coordinates found in route response', path);
+            alert('Route received but could not parse coordinates. Check console for details.');
+          }
+        } else {
+          console.warn('No paths in route response', data);
+          alert('No route found between the selected points.');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching route:', error);
+        alert('Failed to fetch route. Make sure GraphHopper server is running at http://localhost:8989');
+      });
+  }
+
+  function handleMapClickForRouting(e) {
+    if (!isRoutingMode) return;
+
+    const latlng = e.latlng;
+
+    if (!routeStartPoint) {
+      // Set start point
+      routeStartPoint = latlng;
+      routeStartMarker = createRouteMarker(latlng, true).addTo(map);
+      routeStartMarker.bindPopup('Start point').openPopup();
+      console.log('Start point set:', latlng);
+    } else if (!routeEndPoint) {
+      // Set end point
+      routeEndPoint = latlng;
+      routeEndMarker = createRouteMarker(latlng, false).addTo(map);
+      routeEndMarker.bindPopup('End point').openPopup();
+      console.log('End point set:', latlng);
+
+      // Request route
+      requestRoute(routeStartPoint, routeEndPoint);
+
+      // Disable routing mode after both points are set
+      toggleRoutingMode();
+    }
+  }
+
+  function toggleRoutingMode() {
+    isRoutingMode = !isRoutingMode;
+    
+    if (isRoutingMode) {
+      routeBtn.classList.add('active');
+      routeBtn.title = 'Click two points on the map (routing mode active)';
+      map.getContainer().style.cursor = 'crosshair';
+      
+      // Clear any existing route
+      clearRoute();
+      
+      // Add click handler
+      if (!routeClickHandler) {
+        routeClickHandler = map.on('click', handleMapClickForRouting);
+      }
+    } else {
+      routeBtn.classList.remove('active');
+      routeBtn.title = 'Click two points to create a route';
+      map.getContainer().style.cursor = '';
+      
+      // Remove click handler
+      if (routeClickHandler) {
+        map.off('click', handleMapClickForRouting);
+        routeClickHandler = null;
+      }
+    }
+  }
+
+  if (routeBtn) {
+    routeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleRoutingMode();
+    });
+  }
+
+  // Allow dragging markers to update route
+  function setupMarkerDrag() {
+    if (routeStartMarker) {
+      // Remove existing handlers to avoid duplicates
+      routeStartMarker.off('dragend');
+      routeStartMarker.on('dragend', function() {
+        routeStartPoint = this.getLatLng();
+        if (routeStartPoint && routeEndPoint) {
+          requestRoute(routeStartPoint, routeEndPoint);
+        }
+      });
+    }
+    if (routeEndMarker) {
+      // Remove existing handlers to avoid duplicates
+      routeEndMarker.off('dragend');
+      routeEndMarker.on('dragend', function() {
+        routeEndPoint = this.getLatLng();
+        if (routeStartPoint && routeEndPoint) {
+          requestRoute(routeStartPoint, routeEndPoint);
+        }
+      });
+    }
   }
 
   // Phone popdown (Helpline) — same structure as helpline page
