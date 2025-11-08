@@ -137,7 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
     tileSize: 256,
     attribution: 'Kathmandu MBTiles',
     crossOrigin: true
-  }).addTo(map);
+}).addTo(map);
+
 
   const WALKING_SPEED_MPS = 1.3;
   let routeTarget = null;

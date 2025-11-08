@@ -15,10 +15,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Add video at the top ---
     const videoEl = document.createElement("video");
-    videoEl.src = "waterfiltration.mp4"; // your video file
     videoEl.controls = true;
     videoEl.preload = "metadata";
+    videoEl.playsInline = true;
+    videoEl.setAttribute("playsinline", "true");
+    videoEl.setAttribute("webkit-playsinline", "true");
     videoEl.id = "water-video";
+    videoEl.style.width = "100%";
+    videoEl.style.maxHeight = "250px";
+    videoEl.style.borderRadius = "12px";
+    videoEl.style.marginBottom = "16px";
+    videoEl.style.display = "block";
+    
+    // Use source element for better browser compatibility
+    const sourceEl = document.createElement("source");
+    sourceEl.src = "video/waterfiltration.mp4";
+    sourceEl.type = "video/mp4";
+    videoEl.appendChild(sourceEl);
+    
+    // Error handling
+    videoEl.addEventListener("error", (e) => {
+      console.error("Video error:", e);
+      const errorMsg = document.createElement("div");
+      errorMsg.style.cssText = "padding: 20px; text-align: center; color: #dc2626; background: #fee2e2; border-radius: 8px; margin-bottom: 16px;";
+      errorMsg.textContent = "Video could not be loaded. Please check the file path.";
+      container.insertBefore(errorMsg, container.firstChild);
+    });
+    
+    // Load event to verify video loads
+    videoEl.addEventListener("loadedmetadata", () => {
+      console.log("Video metadata loaded successfully");
+    });
+    
     container.appendChild(videoEl);
 
     // --- Page title ---
